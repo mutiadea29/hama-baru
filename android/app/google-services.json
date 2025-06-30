@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "755423090844",
+    "project_id": "hama-c9102",
+    "storage_bucket": "hama-c9102.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755423090844:android:3d818959d5a5c936543559",
+        "android_client_info": {
+          "package_name": "com.example.hama"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASRXLkw80BmFw5mRGgKL8xbjbki9yz3zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

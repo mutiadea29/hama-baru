@@ -14,6 +14,7 @@ class DaftarRuanganPage extends StatelessWidget {
           if (!snapshot.hasData) return const CircularProgressIndicator();
 
           final ruangan = snapshot.data!.docs;
+          
 
           return ListView.builder(
             itemCount: ruangan.length,

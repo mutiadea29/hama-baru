@@ -7,6 +7,7 @@ class AdminRuanganPage extends StatelessWidget {
   void hapusRuangan(String id) {
     FirebaseFirestore.instance.collection('ruangan').doc(id).delete();
   }
+  
 
   void showForm(BuildContext context, {DocumentSnapshot? ruangan}) {
     final namaController = TextEditingController(

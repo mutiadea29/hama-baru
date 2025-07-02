@@ -20,7 +20,7 @@ class UserDashboard extends StatelessWidget {
     } else if (type == 'status') {
       return ref.where('status', whereIn: ['pending', 'confirmed']).snapshots();
     } else {
-      return ref.snapshots(); // semua booking
+      return ref.snapshots();
     }
   }
 
@@ -37,35 +37,48 @@ class UserDashboard extends StatelessWidget {
         int count = snapshot.data?.docs.length ?? 0;
 
         return Container(
-          constraints: const BoxConstraints(maxHeight: 120),
-          width: double.infinity,
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: color, width: 1),
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Icon(icon, color: color, size: 24),
-              Text(
-                title,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                children: [
+                  Icon(icon, color: color, size: 28),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                  )
+                ],
               ),
+              const SizedBox(height: 8),
               Text(
                 '$count data',
                 style: TextStyle(
-                  color: color,
-                  fontSize: 18,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: color,
                 ),
               ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: const Text('View Details'),
+                ),
+              )
             ],
           ),
         );
@@ -149,12 +162,12 @@ class UserDashboard extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             GridView.count(
-              crossAxisCount: 2,
+              crossAxisCount: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 1.8,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.2,
               children: [
                 _buildInfoCard(
                   title: 'Booking Ruangan',

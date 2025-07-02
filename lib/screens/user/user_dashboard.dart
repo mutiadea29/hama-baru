@@ -36,9 +36,7 @@ class UserDashboard extends StatelessWidget {
                 backgroundColor: Colors.white,
                 child: Icon(Icons.person, size: 40, color: Colors.green),
               ),
-              decoration: const BoxDecoration(
-                color: Colors.green,
-              ),
+              decoration: const BoxDecoration(color: Colors.green),
             ),
             ListTile(
               leading: const Icon(Icons.book),
@@ -71,51 +69,38 @@ class UserDashboard extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
           children: [
-            Text(
-              'Hai, ${user?.email ?? 'Pengguna'} 👋',
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            _buildDashboardCard(
+              icon: Icons.book,
+              label: 'Booking Ruangan',
+              count: '12',
+              color: Colors.teal,
+              onTap: () => Navigator.pushNamed(context, '/booking'),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Selamat datang di dashboard, silakan pilih fitur yang ingin kamu gunakan:',
-              style: TextStyle(fontSize: 16),
+            _buildDashboardCard(
+              icon: Icons.pending_actions,
+              label: 'Status Booking',
+              count: '3',
+              color: Colors.orange,
+              onTap: () => Navigator.pushNamed(context, '/user-status'),
             ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: [
-                  _buildFeatureCard(
-                    icon: Icons.book,
-                    label: 'Booking Ruangan',
-                    color: Colors.teal,
-                    onTap: () => Navigator.pushNamed(context, '/booking'),
-                  ),
-                  _buildFeatureCard(
-                    icon: Icons.pending_actions,
-                    label: 'Status Booking',
-                    color: Colors.orange,
-                    onTap: () => Navigator.pushNamed(context, '/user-status'),
-                  ),
-                  _buildFeatureCard(
-                    icon: Icons.history,
-                    label: 'Riwayat Booking',
-                    color: Colors.blue,
-                    onTap: () => Navigator.pushNamed(context, '/riwayat'),
-                  ),
-                  _buildFeatureCard(
-                    icon: Icons.person,
-                    label: 'Profil',
-                    color: Colors.purple,
-                    onTap: () => Navigator.pushNamed(context, '/profile'),
-                  ),
-                ],
-              ),
+            _buildDashboardCard(
+              icon: Icons.history,
+              label: 'Riwayat Booking',
+              count: '25',
+              color: Colors.blue,
+              onTap: () => Navigator.pushNamed(context, '/riwayat'),
+            ),
+            _buildDashboardCard(
+              icon: Icons.person,
+              label: 'Profil',
+              count: '',
+              color: Colors.purple,
+              onTap: () => Navigator.pushNamed(context, '/profile'),
             ),
           ],
         ),
@@ -123,37 +108,51 @@ class UserDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureCard({
+  Widget _buildDashboardCard({
     required IconData icon,
     required String label,
+    required String count,
     required Color color,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color, width: 1),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: color),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: color,
-                fontWeight: FontWeight.w600,
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 4,
+        color: color.withOpacity(0.1),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Icon(icon, size: 40, color: color),
+              if (count.isNotEmpty)
+                Text(
+                  count,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
+              const Spacer(),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Text("View Details", style: TextStyle(color: color)),
+              )
+            ],
+          ),
         ),
       ),
     );

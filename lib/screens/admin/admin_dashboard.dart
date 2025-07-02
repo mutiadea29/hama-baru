@@ -75,8 +75,7 @@ class AdminDashboard extends StatelessWidget {
                     icon: Icons.check_circle_outline,
                     title: 'Verifikasi Booking',
                     onTap:
-                        () =>
-                            _navigateTo(context, const VerifikasiBookingPage()),
+                        () => _navigateTo(context, const VerifikasiBookingPage()),
                   ),
                   _buildDrawerItem(
                     context,
@@ -88,11 +87,8 @@ class AdminDashboard extends StatelessWidget {
                     context,
                     icon: Icons.list_alt,
                     title: 'Kelola Booking',
-                    onTap:
-                        () => _navigateTo(
-                          context,
-                          const AdminManageBookingPage(),
-                        ),
+                    onTap: () =>
+                        _navigateTo(context, const AdminManageBookingPage()),
                   ),
                   _buildDrawerItem(
                     context,
@@ -127,39 +123,39 @@ class AdminDashboard extends StatelessWidget {
           crossAxisCount: 2,
           crossAxisSpacing: 20,
           mainAxisSpacing: 20,
-          childAspectRatio: 1.2,
+          childAspectRatio: 1,
           children: [
-            _DashboardCard(
+            _buildAdminCard(
               icon: Icons.meeting_room,
               label: 'Daftar Ruangan',
               color: Colors.blue,
               onTap: () => _navigateTo(context, const DaftarRuanganPage()),
             ),
-            _DashboardCard(
+            _buildAdminCard(
               icon: Icons.add_business,
               label: 'Tambah Ruangan',
               color: Colors.green,
               onTap: () => _navigateTo(context, const AddRoomPage()),
             ),
-            _DashboardCard(
+            _buildAdminCard(
               icon: Icons.check_circle_outline,
               label: 'Verifikasi Booking',
               color: Colors.orange,
               onTap: () => _navigateTo(context, const VerifikasiBookingPage()),
             ),
-            _DashboardCard(
+            _buildAdminCard(
               icon: Icons.history,
               label: 'Riwayat Booking',
               color: Colors.deepPurple,
               onTap: () => _navigateTo(context, const AdminRiwayatPage()),
             ),
-            _DashboardCard(
+            _buildAdminCard(
               icon: Icons.list_alt,
               label: 'Kelola Booking',
               color: Colors.teal,
               onTap: () => _navigateTo(context, const AdminManageBookingPage()),
             ),
-            _DashboardCard(
+            _buildAdminCard(
               icon: Icons.person,
               label: 'Profil',
               color: Colors.pink,
@@ -171,6 +167,60 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 
+  Widget _buildAdminCard({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              backgroundColor: color.withOpacity(0.1),
+              child: Icon(icon, size: 30, color: color),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const Spacer(),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                'Lihat Detail',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildDrawerItem(
     BuildContext context, {
@@ -188,56 +238,5 @@ class AdminDashboard extends StatelessWidget {
   void _navigateTo(BuildContext context, Widget page) {
     Navigator.pop(context);
     Navigator.push(context, MaterialPageRoute(builder: (_) => page));
-  }
-}
-
-class _DashboardCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _DashboardCard({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 4,
-      borderRadius: BorderRadius.circular(20),
-      color: Colors.white,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: color.withOpacity(0.1),
-                child: Icon(icon, size: 32, color: color),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey[800],
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

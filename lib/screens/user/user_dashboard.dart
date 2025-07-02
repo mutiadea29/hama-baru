@@ -1,18 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserDashboard extends StatelessWidget {
+class UserDashboard extends StatefulWidget {
   const UserDashboard({super.key});
+
+  @override
+  State<UserDashboard> createState() => _UserDashboardState();
+}
+
+class _UserDashboardState extends State<UserDashboard> {
+  final User? user = FirebaseAuth.instance.currentUser;
 
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushReplacementNamed(context, '/');
   }
 
+  Stream<QuerySnapshot> _getBookingData(String type) {
+    final bookingsRef = FirebaseFirestore.instance
+        .collection('bookings')
+        .where('userId', isEqualTo: user?.uid);
+
+    if (type == 'riwayat') {
+      return bookingsRef.where('status', isEqualTo: 'done').snapshots();
+    } else if (type == 'status') {
+      return bookingsRef.where('status', whereIn: ['pending', 'confirmed']).snapshots();
+    } else {
+      return bookingsRef.snapshots(); // Semua booking
+    }
+  }
+
+  Widget _buildBookingList(String title, String type, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+        const SizedBox(height: 8),
+        StreamBuilder<QuerySnapshot>(
+          stream: _getBookingData(type),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Text("Tidak ada data tersedia.");
+            }
+
+            final bookings = snapshot.data!.docs;
+
+            return Column(
+              children: bookings.map((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                return Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  child: ListTile(
+                    leading: const Icon(Icons.meeting_room),
+                    title: Text(data['roomName'] ?? '-'),
+                    subtitle: Text("Tanggal: ${data['date'] ?? '-'}\nStatus: ${data['status'] ?? '-'}"),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard Pengguna'),
@@ -20,25 +79,20 @@ class UserDashboard extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
             onPressed: () => _logout(context),
           ),
         ],
       ),
       drawer: Drawer(
         child: ListView(
-          padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
               accountName: const Text('Pengguna'),
               accountEmail: Text(user?.email ?? 'Email tidak tersedia'),
               currentAccountPicture: const CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 40, color: Colors.green),
+                child: Icon(Icons.person, color: Colors.green, size: 40),
               ),
-              decoration: const BoxDecoration(
-                color: Colors.green,
-              ),
+              decoration: const BoxDecoration(color: Colors.green),
             ),
             ListTile(
               leading: const Icon(Icons.book),
@@ -71,88 +125,21 @@ class UserDashboard extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
             Text(
               'Hai, ${user?.email ?? 'Pengguna'} 👋',
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             const Text(
-              'Selamat datang di dashboard, silakan pilih fitur yang ingin kamu gunakan:',
+              'Berikut data booking ruangan kamu:',
               style: TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: [
-                  _buildFeatureCard(
-                    icon: Icons.book,
-                    label: 'Booking Ruangan',
-                    color: Colors.teal,
-                    onTap: () => Navigator.pushNamed(context, '/booking'),
-                  ),
-                  _buildFeatureCard(
-                    icon: Icons.pending_actions,
-                    label: 'Status Booking',
-                    color: Colors.orange,
-                    onTap: () => Navigator.pushNamed(context, '/user-status'),
-                  ),
-                  _buildFeatureCard(
-                    icon: Icons.history,
-                    label: 'Riwayat Booking',
-                    color: Colors.blue,
-                    onTap: () => Navigator.pushNamed(context, '/riwayat'),
-                  ),
-                  _buildFeatureCard(
-                    icon: Icons.person,
-                    label: 'Profil',
-                    color: Colors.purple,
-                    onTap: () => Navigator.pushNamed(context, '/profile'),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeatureCard({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color, width: 1),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: color),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: color,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            const SizedBox(height: 20),
+            _buildBookingList("📌 Booking Aktif", "booking", Colors.teal),
+            _buildBookingList("⏳ Status Booking", "status", Colors.orange),
+            _buildBookingList("📁 Riwayat Booking", "riwayat", Colors.blue),
           ],
         ),
       ),

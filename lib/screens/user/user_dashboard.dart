@@ -2,76 +2,82 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserDashboard extends StatefulWidget {
+class UserDashboard extends StatelessWidget {
   const UserDashboard({super.key});
-
-  @override
-  State<UserDashboard> createState() => _UserDashboardState();
-}
-
-class _UserDashboardState extends State<UserDashboard> {
-  final User? user = FirebaseAuth.instance.currentUser;
 
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushReplacementNamed(context, '/');
   }
 
-  Stream<QuerySnapshot> _getBookingData(String type) {
-    final bookingsRef = FirebaseFirestore.instance
+  Stream<QuerySnapshot> _getBookingData(String type, String uid) {
+    final ref = FirebaseFirestore.instance
         .collection('bookings')
-        .where('userId', isEqualTo: user?.uid);
+        .where('userId', isEqualTo: uid);
 
     if (type == 'riwayat') {
-      return bookingsRef.where('status', isEqualTo: 'done').snapshots();
+      return ref.where('status', isEqualTo: 'done').snapshots();
     } else if (type == 'status') {
-      return bookingsRef.where('status', whereIn: ['pending', 'confirmed']).snapshots();
+      return ref.where('status', whereIn: ['pending', 'confirmed']).snapshots();
     } else {
-      return bookingsRef.snapshots(); // Semua booking
+      return ref.snapshots(); // semua booking
     }
   }
 
-  Widget _buildBookingList(String title, String type, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
-        const SizedBox(height: 8),
-        StreamBuilder<QuerySnapshot>(
-          stream: _getBookingData(type),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Text("Tidak ada data tersedia.");
-            }
+  Widget _buildInfoCard({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required String type,
+    required String uid,
+  }) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _getBookingData(type, uid),
+      builder: (context, snapshot) {
+        int count = snapshot.data?.docs.length ?? 0;
 
-            final bookings = snapshot.data!.docs;
-
-            return Column(
-              children: bookings.map((doc) {
-                final data = doc.data() as Map<String, dynamic>;
-                return Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  child: ListTile(
-                    leading: const Icon(Icons.meeting_room),
-                    title: Text(data['roomName'] ?? '-'),
-                    subtitle: Text("Tanggal: ${data['date'] ?? '-'}\nStatus: ${data['status'] ?? '-'}"),
-                  ),
-                );
-              }).toList(),
-            );
-          },
-        ),
-        const SizedBox(height: 16),
-      ],
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color, width: 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: color, size: 30),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '$count data',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid ?? '';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard Pengguna'),
@@ -79,20 +85,25 @@ class _UserDashboardState extends State<UserDashboard> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
             onPressed: () => _logout(context),
           ),
         ],
       ),
       drawer: Drawer(
         child: ListView(
+          padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
               accountName: const Text('Pengguna'),
               accountEmail: Text(user?.email ?? 'Email tidak tersedia'),
               currentAccountPicture: const CircleAvatar(
-                child: Icon(Icons.person, color: Colors.green, size: 40),
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, size: 40, color: Colors.green),
               ),
-              decoration: const BoxDecoration(color: Colors.green),
+              decoration: const BoxDecoration(
+                color: Colors.green,
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.book),
@@ -133,13 +144,50 @@ class _UserDashboardState extends State<UserDashboard> {
             ),
             const SizedBox(height: 12),
             const Text(
-              'Berikut data booking ruangan kamu:',
+              'Berikut ringkasan data booking kamu:',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
-            _buildBookingList("📌 Booking Aktif", "booking", Colors.teal),
-            _buildBookingList("⏳ Status Booking", "status", Colors.orange),
-            _buildBookingList("📁 Riwayat Booking", "riwayat", Colors.blue),
+
+            // Info cards (dashboard kotak warna-warni)
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.2,
+              children: [
+                _buildInfoCard(
+                  title: 'Booking Ruangan',
+                  icon: Icons.book,
+                  color: Colors.teal,
+                  type: 'booking',
+                  uid: uid,
+                ),
+                _buildInfoCard(
+                  title: 'Status Booking',
+                  icon: Icons.pending_actions,
+                  color: Colors.orange,
+                  type: 'status',
+                  uid: uid,
+                ),
+                _buildInfoCard(
+                  title: 'Riwayat Booking',
+                  icon: Icons.history,
+                  color: Colors.blue,
+                  type: 'riwayat',
+                  uid: uid,
+                ),
+                _buildInfoCard(
+                  title: 'Profil Saya',
+                  icon: Icons.person,
+                  color: Colors.purple,
+                  type: 'profile',
+                  uid: uid,
+                ),
+              ],
+            ),
           ],
         ),
       ),

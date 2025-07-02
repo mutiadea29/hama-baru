@@ -37,32 +37,32 @@ class UserDashboard extends StatelessWidget {
         int count = snapshot.data?.docs.length ?? 0;
 
         return Container(
+          constraints: const BoxConstraints(maxHeight: 120),
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(color: color, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Icon(icon, color: color, size: 30),
-              const SizedBox(height: 8),
+              Icon(icon, color: color, size: 24),
               Text(
                 title,
                 style: TextStyle(
                   color: color,
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 4),
               Text(
                 '$count data',
                 style: TextStyle(
                   color: color,
-                  fontSize: 24,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -148,15 +148,13 @@ class UserDashboard extends StatelessWidget {
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
-
-            // Info cards (dashboard kotak warna-warni)
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 1.8,
               children: [
                 _buildInfoCard(
                   title: 'Booking Ruangan',

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserDashboard extends StatelessWidget {
   const UserDashboard({super.key});
@@ -10,86 +9,9 @@ class UserDashboard extends StatelessWidget {
     Navigator.pushReplacementNamed(context, '/');
   }
 
-  Stream<QuerySnapshot> _getBookingData(String type, String uid) {
-    final ref = FirebaseFirestore.instance
-        .collection('bookings')
-        .where('userId', isEqualTo: uid);
-
-    if (type == 'riwayat') {
-      return ref.where('status', isEqualTo: 'done').snapshots();
-    } else if (type == 'status') {
-      return ref.where('status', whereIn: ['pending', 'confirmed']).snapshots();
-    } else {
-      return ref.snapshots();
-    }
-  }
-
-  Widget _buildInfoCard({
-    required String title,
-    required IconData icon,
-    required Color color,
-    required String type,
-    required String uid,
-  }) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _getBookingData(type, uid),
-      builder: (context, snapshot) {
-        int count = snapshot.data?.docs.length ?? 0;
-
-        return Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: color, width: 1),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, color: color, size: 28),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '$count data',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text('View Details'),
-                ),
-              )
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -149,55 +71,87 @@ class UserDashboard extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Hai, ${user?.email ?? 'Pengguna'} 👋',
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             const Text(
-              'Berikut ringkasan data booking kamu:',
+              'Selamat datang di dashboard, silakan pilih fitur yang ingin kamu gunakan:',
               style: TextStyle(fontSize: 16),
             ),
-            const SizedBox(height: 20),
-            GridView.count(
-              crossAxisCount: 3,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.2,
-              children: [
-                _buildInfoCard(
-                  title: 'Booking Ruangan',
-                  icon: Icons.book,
-                  color: Colors.teal,
-                  type: 'booking',
-                  uid: uid,
-                ),
-                _buildInfoCard(
-                  title: 'Status Booking',
-                  icon: Icons.pending_actions,
-                  color: Colors.orange,
-                  type: 'status',
-                  uid: uid,
-                ),
-                _buildInfoCard(
-                  title: 'Riwayat Booking',
-                  icon: Icons.history,
-                  color: Colors.blue,
-                  type: 'riwayat',
-                  uid: uid,
-                ),
-                _buildInfoCard(
-                  title: 'Profil Saya',
-                  icon: Icons.person,
-                  color: Colors.purple,
-                  type: 'profile',
-                  uid: uid,
-                ),
-              ],
+            const SizedBox(height: 24),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: [
+                  _buildFeatureCard(
+                    icon: Icons.book,
+                    label: 'Booking Ruangan',
+                    color: Colors.teal,
+                    onTap: () => Navigator.pushNamed(context, '/booking'),
+                  ),
+                  _buildFeatureCard(
+                    icon: Icons.pending_actions,
+                    label: 'Status Booking',
+                    color: Colors.orange,
+                    onTap: () => Navigator.pushNamed(context, '/user-status'),
+                  ),
+                  _buildFeatureCard(
+                    icon: Icons.history,
+                    label: 'Riwayat Booking',
+                    color: Colors.blue,
+                    onTap: () => Navigator.pushNamed(context, '/riwayat'),
+                  ),
+                  _buildFeatureCard(
+                    icon: Icons.person,
+                    label: 'Profil',
+                    color: Colors.purple,
+                    onTap: () => Navigator.pushNamed(context, '/profile'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color, width: 1),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: color),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),

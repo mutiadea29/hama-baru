@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DaftarRuanganPage extends StatelessWidget {
   const DaftarRuanganPage({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +15,7 @@ class DaftarRuanganPage extends StatelessWidget {
           if (!snapshot.hasData) return const CircularProgressIndicator();
 
           final ruangan = snapshot.data!.docs;
+          
 
           return ListView.builder(
             itemCount: ruangan.length,

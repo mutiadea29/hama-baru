@@ -8,6 +8,7 @@ class RiwayatRuangan extends StatefulWidget {
   State<RiwayatRuangan> createState() => _RiwayatRuanganState();
 }
 
+
 class _RiwayatRuanganState extends State<RiwayatRuangan> {
   String searchQuery = '';
 

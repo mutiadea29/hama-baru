@@ -13,6 +13,7 @@ class EditRuanganPage extends StatefulWidget {
     required this.lokasi,
   });
 
+
   @override
   State<EditRuanganPage> createState() => _EditRuanganPageState();
 }

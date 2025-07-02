@@ -77,28 +77,24 @@ class UserDashboard extends StatelessWidget {
             _buildDashboardCard(
               icon: Icons.meeting_room,
               label: 'Booking Ruangan',
-              count: '12',
               color: Colors.teal,
               onTap: () => Navigator.pushNamed(context, '/booking'),
             ),
             _buildDashboardCard(
               icon: Icons.pending_actions,
               label: 'Status Booking',
-              count: '3',
               color: Colors.orange,
               onTap: () => Navigator.pushNamed(context, '/user-status'),
             ),
             _buildDashboardCard(
               icon: Icons.history,
               label: 'Riwayat Booking',
-              count: '25',
               color: Colors.indigo,
               onTap: () => Navigator.pushNamed(context, '/riwayat'),
             ),
             _buildDashboardCard(
               icon: Icons.account_circle,
               label: 'Profil',
-              count: '',
               color: Colors.purple,
               onTap: () => Navigator.pushNamed(context, '/profile'),
             ),
@@ -111,7 +107,6 @@ class UserDashboard extends StatelessWidget {
   Widget _buildDashboardCard({
     required IconData icon,
     required String label,
-    required String count,
     required Color color,
     required VoidCallback onTap,
   }) {
@@ -142,20 +137,11 @@ class UserDashboard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               label,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            if (count.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  count,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
+            ),
             const Spacer(),
             Align(
               alignment: Alignment.bottomRight,

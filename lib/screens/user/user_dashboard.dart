@@ -68,33 +68,37 @@ class UserDashboard extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: GridView.count(
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
           children: [
             _buildDashboardCard(
-              icon: Icons.meeting_room,
+              icon: Icons.book,
               label: 'Booking Ruangan',
+              count: '12',
               color: Colors.teal,
               onTap: () => Navigator.pushNamed(context, '/booking'),
             ),
             _buildDashboardCard(
               icon: Icons.pending_actions,
               label: 'Status Booking',
+              count: '3',
               color: Colors.orange,
               onTap: () => Navigator.pushNamed(context, '/user-status'),
             ),
             _buildDashboardCard(
               icon: Icons.history,
               label: 'Riwayat Booking',
-              color: Colors.indigo,
+              count: '25',
+              color: Colors.blue,
               onTap: () => Navigator.pushNamed(context, '/riwayat'),
             ),
             _buildDashboardCard(
-              icon: Icons.account_circle,
+              icon: Icons.person,
               label: 'Profil',
+              count: '',
               color: Colors.purple,
               onTap: () => Navigator.pushNamed(context, '/profile'),
             ),
@@ -107,54 +111,48 @@ class UserDashboard extends StatelessWidget {
   Widget _buildDashboardCard({
     required IconData icon,
     required String label,
+    required String count,
     required Color color,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              backgroundColor: color.withOpacity(0.1),
-              child: Icon(icon, size: 30, color: color),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const Spacer(),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Text(
-                'Lihat Detail',
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 4,
+        color: color.withOpacity(0.1),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Icon(icon, size: 40, color: color),
+              if (count.isNotEmpty)
+                Text(
+                  count,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              Text(
+                label,
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 16,
                   color: color,
-                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            )
-          ],
+              const Spacer(),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Text("View Details", style: TextStyle(color: color)),
+              )
+            ],
+          ),
         ),
       ),
     );

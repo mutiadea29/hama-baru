@@ -36,9 +36,7 @@ class UserDashboard extends StatelessWidget {
                 backgroundColor: Colors.white,
                 child: Icon(Icons.person, size: 40, color: Colors.green),
               ),
-              decoration: const BoxDecoration(
-                color: Colors.green,
-              ),
+              decoration: const BoxDecoration(color: Colors.green),
             ),
             ListTile(
               leading: const Icon(Icons.book),
@@ -70,7 +68,7 @@ class UserDashboard extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -90,26 +88,26 @@ class UserDashboard extends StatelessWidget {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 children: [
-                  _buildFeatureCard(
-                    icon: Icons.book,
+                  _buildDashboardCard(
+                    icon: Icons.meeting_room,
                     label: 'Booking Ruangan',
                     color: Colors.teal,
                     onTap: () => Navigator.pushNamed(context, '/booking'),
                   ),
-                  _buildFeatureCard(
+                  _buildDashboardCard(
                     icon: Icons.pending_actions,
                     label: 'Status Booking',
                     color: Colors.orange,
                     onTap: () => Navigator.pushNamed(context, '/user-status'),
                   ),
-                  _buildFeatureCard(
+                  _buildDashboardCard(
                     icon: Icons.history,
                     label: 'Riwayat Booking',
-                    color: Colors.blue,
+                    color: Colors.indigo,
                     onTap: () => Navigator.pushNamed(context, '/riwayat'),
                   ),
-                  _buildFeatureCard(
-                    icon: Icons.person,
+                  _buildDashboardCard(
+                    icon: Icons.account_circle,
                     label: 'Profil',
                     color: Colors.purple,
                     onTap: () => Navigator.pushNamed(context, '/profile'),
@@ -123,7 +121,7 @@ class UserDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureCard({
+  Widget _buildDashboardCard({
     required IconData icon,
     required String label,
     required Color color,
@@ -134,25 +132,45 @@ class UserDashboard extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color, width: 1),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 40, color: color),
-            const SizedBox(height: 12),
+            CircleAvatar(
+              backgroundColor: color.withOpacity(0.1),
+              child: Icon(icon, size: 30, color: color),
+            ),
+            const SizedBox(height: 16),
             Text(
               label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
-                color: color,
                 fontWeight: FontWeight.w600,
               ),
             ),
+            const Spacer(),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                'Lihat Detail',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: color,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            )
           ],
         ),
       ),

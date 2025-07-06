@@ -14,7 +14,7 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: const Color(0xFFF8F9FB),
       appBar: AppBar(
         title: const Text(
           "Riwayat Ruangan",
@@ -22,13 +22,13 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
         ),
         centerTitle: true,
         backgroundColor: Colors.blue.shade700,
-        elevation: 2,
+        elevation: 3,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Search Field
+            // Search
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -42,9 +42,7 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 16,
-                      ),
+                          vertical: 14, horizontal: 16),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -65,13 +63,13 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
             ),
             const SizedBox(height: 20),
 
-            // Tabel Data
+            // Table
             Expanded(
               child: Card(
-                elevation: 6,
+                elevation: 8,
+                shadowColor: Colors.black12,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
+                    borderRadius: BorderRadius.circular(20)),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: StreamBuilder<QuerySnapshot>(
@@ -108,24 +106,24 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
 
                       return Scrollbar(
                         thumbVisibility: true,
-                        radius: const Radius.circular(10),
+                        radius: const Radius.circular(8),
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: DataTable(
-                              columnSpacing: 40,
-                              headingRowColor: MaterialStateColor.resolveWith(
-                                (states) => Colors.blue.shade50,
-                              ),
-                              dataRowHeight: 60,
+                              columnSpacing: 36,
+                              headingRowColor: MaterialStateProperty.all(
+                                  Colors.blue.shade50),
                               headingTextStyle: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.black87,
                               ),
-                              border: TableBorder.all(
-                                color: Colors.grey.shade300,
+                              border: TableBorder.symmetric(
+                                inside: BorderSide(
+                                  color: Colors.grey.shade300,
+                                  width: 1,
+                                ),
                               ),
                               columns: const [
                                 DataColumn(label: Text('Nama Ruangan')),
@@ -142,32 +140,35 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
                                     dataMap['kapasitas']?.toString() ?? '-';
                                 final status = dataMap['riwayat_status'] ?? '-';
 
+                                Color statusColor;
+                                if (status == 'selesai') {
+                                  statusColor = Colors.green.shade600;
+                                } else if (status == 'batal') {
+                                  statusColor = Colors.red.shade600;
+                                } else {
+                                  statusColor = Colors.grey.shade600;
+                                }
+
                                 return DataRow(
                                   cells: [
-                                    DataCell(Text(
-                                      ruangan,
-                                      style: const TextStyle(fontSize: 14),
-                                    )),
-                                    DataCell(Text(
-                                      tanggal,
-                                      style: const TextStyle(fontSize: 14),
-                                    )),
-                                    DataCell(Text(
-                                      '$kapasitas orang',
-                                      style: const TextStyle(fontSize: 14),
-                                    )),
-                                    DataCell(
-                                      Text(
+                                    DataCell(Text(ruangan)),
+                                    DataCell(Text(tanggal)),
+                                    DataCell(Text('$kapasitas orang')),
+                                    DataCell(Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: statusColor.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
                                         status,
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          color: statusColor,
                                           fontWeight: FontWeight.w600,
-                                          color: status == 'selesai'
-                                              ? Colors.green
-                                              : Colors.red,
                                         ),
                                       ),
-                                    ),
+                                    )),
                                   ],
                                 );
                               }).toList(),

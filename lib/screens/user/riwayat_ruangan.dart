@@ -28,7 +28,7 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Search
+            // Search Field
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -63,15 +63,15 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
             ),
             const SizedBox(height: 20),
 
-            // Table
+            // Data Table
             Expanded(
               child: Card(
-                elevation: 8,
-                shadowColor: Colors.black12,
+                elevation: 6,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('booking')
@@ -117,13 +117,19 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
                                   Colors.blue.shade50),
                               headingTextStyle: const TextStyle(
                                 fontWeight: FontWeight.bold,
+                                fontSize: 15,
                                 color: Colors.black87,
                               ),
-                              border: TableBorder.symmetric(
-                                inside: BorderSide(
-                                  color: Colors.grey.shade300,
-                                  width: 1,
-                                ),
+                              dataRowColor: MaterialStateProperty.resolveWith<Color?>(
+                                (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.selected)) {
+                                    return Colors.blue.shade100;
+                                  }
+                                  return Colors.grey.shade50;
+                                },
+                              ),
+                              border: TableBorder.all(
+                                color: Colors.grey.shade300,
                               ),
                               columns: const [
                                 DataColumn(label: Text('Nama Ruangan')),
@@ -140,35 +146,54 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
                                     dataMap['kapasitas']?.toString() ?? '-';
                                 final status = dataMap['riwayat_status'] ?? '-';
 
-                                Color statusColor;
+                                // Style badge warna pastel
+                                Color badgeColor;
+                                Color badgeTextColor;
+
                                 if (status == 'selesai') {
-                                  statusColor = Colors.green.shade600;
+                                  badgeColor = const Color(0xFFE8F5E9); // green bg
+                                  badgeTextColor = Colors.green.shade700;
                                 } else if (status == 'batal') {
-                                  statusColor = Colors.red.shade600;
+                                  badgeColor = const Color(0xFFFFEBEE); // red bg
+                                  badgeTextColor = Colors.red.shade700;
                                 } else {
-                                  statusColor = Colors.grey.shade600;
+                                  badgeColor = Colors.grey.shade200;
+                                  badgeTextColor = Colors.grey.shade800;
                                 }
 
                                 return DataRow(
                                   cells: [
-                                    DataCell(Text(ruangan)),
-                                    DataCell(Text(tanggal)),
-                                    DataCell(Text('$kapasitas orang')),
-                                    DataCell(Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: statusColor.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Text(
-                                        status,
-                                        style: TextStyle(
-                                          color: statusColor,
-                                          fontWeight: FontWeight.w600,
+                                    DataCell(Text(
+                                      ruangan,
+                                      style: const TextStyle(fontSize: 14),
+                                    )),
+                                    DataCell(Text(
+                                      tanggal,
+                                      style: const TextStyle(fontSize: 14),
+                                    )),
+                                    DataCell(Text(
+                                      '$kapasitas orang',
+                                      style: const TextStyle(fontSize: 14),
+                                    )),
+                                    DataCell(
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: badgeColor,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Text(
+                                          status,
+                                          style: TextStyle(
+                                            color: badgeTextColor,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                          ),
                                         ),
                                       ),
-                                    )),
+                                    ),
                                   ],
                                 );
                               }).toList(),

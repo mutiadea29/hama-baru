@@ -8,7 +8,6 @@ class RiwayatRuangan extends StatefulWidget {
   State<RiwayatRuangan> createState() => _RiwayatRuanganState();
 }
 
-
 class _RiwayatRuanganState extends State<RiwayatRuangan> {
   String searchQuery = '';
 
@@ -22,7 +21,8 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blue.shade600,
+        backgroundColor: Colors.blue.shade700,
+        elevation: 2,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -33,19 +33,25 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(
-                  width: 250,
+                  width: 280,
                   child: TextField(
                     decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       hintText: 'Cari ruangan...',
+                      hintStyle: TextStyle(color: Colors.grey.shade500),
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
-                        vertical: 0,
+                        vertical: 14,
                         horizontal: 16,
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.blue.shade400),
                       ),
                     ),
                     onChanged: (value) {
@@ -57,23 +63,22 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
             // Tabel Data
             Expanded(
               child: Card(
-                elevation: 4,
+                elevation: 6,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
                   child: StreamBuilder<QuerySnapshot>(
-                    stream:
-                        FirebaseFirestore.instance
-                            .collection('booking')
-                            .orderBy('dibuat', descending: true)
-                            .snapshots(),
+                    stream: FirebaseFirestore.instance
+                        .collection('booking')
+                        .orderBy('dibuat', descending: true)
+                        .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return const Center(child: Text('Terjadi kesalahan.'));
@@ -83,19 +88,17 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      final data =
-                          snapshot.data!.docs.where((doc) {
-                            final dataMap = doc.data() as Map<String, dynamic>;
-                            final riwayat = dataMap['riwayat_status'];
-                            final ruangan = dataMap['ruangan'] ?? '';
-                            final isMatched = ruangan
-                                .toString()
-                                .toLowerCase()
-                                .contains(searchQuery.toLowerCase());
-                            return (riwayat == 'selesai' ||
-                                    riwayat == 'batal') &&
-                                isMatched;
-                          }).toList();
+                      final data = snapshot.data!.docs.where((doc) {
+                        final dataMap = doc.data() as Map<String, dynamic>;
+                        final riwayat = dataMap['riwayat_status'];
+                        final ruangan = dataMap['ruangan'] ?? '';
+                        final isMatched = ruangan
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchQuery.toLowerCase());
+                        return (riwayat == 'selesai' || riwayat == 'batal') &&
+                            isMatched;
+                      }).toList();
 
                       if (data.isEmpty) {
                         return const Center(
@@ -105,6 +108,7 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
 
                       return Scrollbar(
                         thumbVisibility: true,
+                        radius: const Radius.circular(10),
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: SingleChildScrollView(
@@ -112,12 +116,13 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
                             child: DataTable(
                               columnSpacing: 40,
                               headingRowColor: MaterialStateColor.resolveWith(
-                                (states) => Colors.blue.shade100,
+                                (states) => Colors.blue.shade50,
                               ),
                               dataRowHeight: 60,
                               headingTextStyle: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                color: Colors.black87,
                               ),
                               border: TableBorder.all(
                                 color: Colors.grey.shade300,
@@ -128,37 +133,44 @@ class _RiwayatRuanganState extends State<RiwayatRuangan> {
                                 DataColumn(label: Text('Kapasitas')),
                                 DataColumn(label: Text('Status')),
                               ],
-                              rows:
-                                  data.map((doc) {
-                                    final dataMap =
-                                        doc.data() as Map<String, dynamic>;
-                                    final ruangan = dataMap['ruangan'] ?? '-';
-                                    final tanggal = dataMap['tanggal'] ?? '-';
-                                    final kapasitas =
-                                        dataMap['kapasitas']?.toString() ?? '-';
-                                    final status =
-                                        dataMap['riwayat_status'] ?? '-';
+                              rows: data.map((doc) {
+                                final dataMap =
+                                    doc.data() as Map<String, dynamic>;
+                                final ruangan = dataMap['ruangan'] ?? '-';
+                                final tanggal = dataMap['tanggal'] ?? '-';
+                                final kapasitas =
+                                    dataMap['kapasitas']?.toString() ?? '-';
+                                final status = dataMap['riwayat_status'] ?? '-';
 
-                                    return DataRow(
-                                      cells: [
-                                        DataCell(Text(ruangan)),
-                                        DataCell(Text(tanggal)),
-                                        DataCell(Text('$kapasitas orang')),
-                                        DataCell(
-                                          Text(
-                                            status,
-                                            style: TextStyle(
-                                              color:
-                                                  status == 'selesai'
-                                                      ? Colors.green
-                                                      : Colors.red,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
+                                return DataRow(
+                                  cells: [
+                                    DataCell(Text(
+                                      ruangan,
+                                      style: const TextStyle(fontSize: 14),
+                                    )),
+                                    DataCell(Text(
+                                      tanggal,
+                                      style: const TextStyle(fontSize: 14),
+                                    )),
+                                    DataCell(Text(
+                                      '$kapasitas orang',
+                                      style: const TextStyle(fontSize: 14),
+                                    )),
+                                    DataCell(
+                                      Text(
+                                        status,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: status == 'selesai'
+                                              ? Colors.green
+                                              : Colors.red,
                                         ),
-                                      ],
-                                    );
-                                  }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
                             ),
                           ),
                         ),

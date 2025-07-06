@@ -7,12 +7,18 @@ class AdminRiwayatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F5F8), // Warna latar lembut
+      backgroundColor: const Color(0xFFF2F5F8),
       appBar: AppBar(
         title: const Text('Riwayat Booking'),
         centerTitle: true,
         backgroundColor: Colors.blue.shade700,
         elevation: 2,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // kembali ke halaman sebelumnya
+          },
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -45,17 +51,16 @@ class AdminRiwayatPage extends StatelessWidget {
               final waktu = booking['waktu'] ?? '-';
               final status = booking['status'] ?? '-';
 
-              // Badge status
               Color badgeColor;
               Color textColor;
               if (status == 'disetujui') {
-                badgeColor = const Color(0xFFE8F5E9); // green bg
+                badgeColor = const Color(0xFFE8F5E9);
                 textColor = Colors.green.shade700;
               } else if (status == 'ditolak') {
-                badgeColor = const Color(0xFFFFEBEE); // red bg
+                badgeColor = const Color(0xFFFFEBEE);
                 textColor = Colors.red.shade700;
               } else {
-                badgeColor = const Color(0xFFFFF9C4); // yellow bg
+                badgeColor = const Color(0xFFFFF9C4);
                 textColor = Colors.orange.shade800;
               }
 

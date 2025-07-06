@@ -34,14 +34,16 @@ class AdminRuanganPage extends StatelessWidget {
                 controller: namaController,
                 decoration: const InputDecoration(
                   labelText: 'Nama Ruangan',
+                  labelStyle: TextStyle(fontWeight: FontWeight.w600),
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               TextField(
                 controller: lokasiController,
                 decoration: const InputDecoration(
                   labelText: 'Lokasi',
+                  labelStyle: TextStyle(fontWeight: FontWeight.w600),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -53,7 +55,13 @@ class AdminRuanganPage extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             child: const Text('Batal'),
           ),
-          ElevatedButton(
+          ElevatedButton.icon(
+            icon: const Icon(Icons.save),
+            label: const Text('Simpan'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue.shade600,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () {
               final data = {
                 'nama': namaController.text,
@@ -71,7 +79,6 @@ class AdminRuanganPage extends StatelessWidget {
 
               Navigator.pop(context);
             },
-            child: const Text('Simpan'),
           ),
         ],
       ),
@@ -81,13 +88,19 @@ class AdminRuanganPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F6FA),
+      backgroundColor: const Color(0xFFF4F7FC),
       appBar: AppBar(
-        title: const Text('Data Ruangan'),
         backgroundColor: Colors.blue.shade700,
+        elevation: 3,
+        title: const Text(
+          'Manajemen Ruangan',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
+            tooltip: 'Tambah Ruangan',
             onPressed: () => showForm(context),
           ),
         ],
@@ -96,7 +109,7 @@ class AdminRuanganPage extends StatelessWidget {
         stream: FirebaseFirestore.instance.collection('ruangan').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const Center(child: Text('Terjadi kesalahan'));
+            return const Center(child: Text('Terjadi kesalahan.'));
           }
 
           if (!snapshot.hasData) {
@@ -110,24 +123,34 @@ class AdminRuanganPage extends StatelessWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             itemCount: data.length,
             itemBuilder: (context, index) {
               final ruangan = data[index];
               final nama = ruangan['nama'];
               final lokasi = ruangan['lokasi'];
 
-              return Card(
+              return Container(
                 margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.blue.shade100),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blueGrey.withOpacity(0.05),
+                      blurRadius: 6,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                elevation: 4,
                 child: ListTile(
                   contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  leading: const Icon(Icons.meeting_room_rounded,
-                      color: Colors.blueAccent),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.blue.shade100,
+                    child: const Icon(Icons.meeting_room, color: Colors.blue),
+                  ),
                   title: Text(
                     nama,
                     style: const TextStyle(
@@ -135,19 +158,24 @@ class AdminRuanganPage extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  subtitle: Text('Lokasi: $lokasi'),
+                  subtitle: Text(
+                    'Lokasi: $lokasi',
+                    style: const TextStyle(fontSize: 13),
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.indigo),
-                        onPressed: () => showForm(context, ruangan: ruangan),
+                        icon: const Icon(Icons.edit),
+                        color: Colors.indigo,
                         tooltip: 'Edit',
+                        onPressed: () => showForm(context, ruangan: ruangan),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => hapusRuangan(ruangan.id),
+                        icon: const Icon(Icons.delete),
+                        color: Colors.redAccent,
                         tooltip: 'Hapus',
+                        onPressed: () => hapusRuangan(ruangan.id),
                       ),
                     ],
                   ),
